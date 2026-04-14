@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: first-nginx
+  namespace: test-namespace
+  labels:
+    env: dev
+    app: nginx-db
+
+spec:
+  containers:
+    - name: nginx-container
+      image: nginx:1-alpine
+    - name: db
+      image: postgres:17
+      env: 
+        - name: POSTGRES_PASSWORD
+          value: "Test123="
+
+      

@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: http-proxy
+  labels:
+    env: dev
+    app: proxy
+
+spec:
+  containers:
+    - name: proxy-apache
+      image: httpd:2.4-trixie
+      resources:
+        requests:
+          cpu: 0.5
+          memory: "50Mi"
+        limits:
+          cpu: 1
+          memory: 100Mi

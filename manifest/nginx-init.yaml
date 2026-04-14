@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+
+data:
+  API_URL: localhost:3000
+  ENV: dev
+
+---
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-config
+spec:
+  containers:
+    - name: nginx
+      image: nginx:latest
+      envFrom:
+        - configMapRef:
+            name: nginx-config
