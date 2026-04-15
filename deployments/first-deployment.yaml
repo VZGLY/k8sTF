@@ -1,0 +1,27 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: first-deployment
+  annotations:
+    kubernetes.io/change-cause: 'Nouvelle version'
+spec:
+  revisionHistoryLimit: 20
+  replicas: 3
+  selector:
+    matchLabels:
+      app: proxy
+      env: dev
+  
+  template:
+    metadata:
+      labels:
+        app: proxy
+        env: dev
+
+    spec:
+      containers:
+        - name: nginx-proxy
+          image: nginx:1.19.32
+          ports:
+            - containerPort: 80

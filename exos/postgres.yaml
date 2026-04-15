@@ -1,0 +1,70 @@
+# sudo kubectl create secret generic pgsql-secret --from-literal=POSTGRES_PASSWORD='Test123='
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pgsql-config
+data:
+  POSTGRES_DB: "test"
+  POSTGRES_USER: "postgres"
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pgsql-pv
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /pgsqldata
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pgsql-pvc
+spec:
+  volumeName: pgsql-pv
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+
+---
+
+apiVersion: v1
+kind: Pod
+metadata: 
+  name: pgsql-pod
+spec:
+  securityContext:
+    fsGroup: 10001
+  volumes:
+    - name: pgsql-volume
+      persistentVolumeClaim:
+        claimName: pgsql-pvc
+  containers:
+    - name: pgsql-container
+      image: postgres:18
+      ports:
+        - containerPort: 5432
+      env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: pgsql-secret
+              key: POSTGRES_PASSWORD
+      envFrom:
+        - configMapRef:
+            name: pgsql-config
+      volumeMounts:
+        - name: pgsql-volume
+          mountPath: /var/lib/postgresql
